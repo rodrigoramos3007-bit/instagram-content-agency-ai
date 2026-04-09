@@ -1,0 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg-primary: #0A0A0F;
+  --color-bg-surface: #13131A;
+  --color-bg-elevated: #1C1C26;
+  --color-accent-primary: #7C3AED;
+  --color-accent-secondary: #EC4899;
+  --color-accent-gold: #F59E0B;
+  --color-text-primary: #F8FAFC;
+  --color-text-secondary: #94A3B8;
+  --color-text-muted: #475569;
+  --color-border: #1E1E2E;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+body {
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2D2D42;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #7C3AED 0%, #EC4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-gold {
+  background: linear-gradient(135deg, #F59E0B 0%, #EF4444 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glass-card {
+  background: rgba(19, 19, 26, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(30, 30, 46, 0.8);
+}
+
+.glow-primary {
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+}
+
+.glow-secondary {
+  box-shadow: 0 0 20px rgba(236, 72, 153, 0.3);
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.05) 50%,
+    rgba(255,255,255,0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.instagram-frame {
+  background: #000;
+  border-radius: 44px;
+  padding: 16px;
+  border: 3px solid #2D2D42;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+}
+
+.card-hover {
+  transition: all 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  border-color: rgba(124, 58, 237, 0.4);
+  box-shadow: 0 8px 32px rgba(124, 58, 237, 0.15);
+}
+
+.btn-glow:hover {
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
