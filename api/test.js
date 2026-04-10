@@ -1,32 +1,8 @@
-module.exports = async function handler(req, res) {
-  const apiKey = process.env.OPENAI_API_KEY;
-  
-  if (!apiKey) {
-    return res.json({ status: 'ERRO', message: 'API key NAO encontrada' });
-  }
+export default function handler(req, res) {
+  const hasKey = !!process.env.OPENAI_API_KEY;
+  const keyStart = process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY.substring(0, 10) : 'nenhuma';
+  res.json({ status: 'ok', apiKeyEncontrada: hasKey, inicio: keyStart });
+}
 
-  try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o',
-        messages: [{ role: 'user', content: 'Diga apenas: FUNCIONOU' }],
-        max_tokens: 20,
-      }),
-    });
-
-    var data = await response.json();
-    if (data.error) {
-      return res.json({ status: 'ERRO_OPENAI', error: data.error });
-    }
-    return res.json({ status: 'OK', resposta: data.choices[0].message.content });
-  } catch (error) {
-    return res.json({ status: 'ERRO', message: error.message });
-  }
-};
 
 
