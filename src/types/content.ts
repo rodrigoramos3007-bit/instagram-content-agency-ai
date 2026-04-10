@@ -16,6 +16,7 @@ export interface ContentIdea {
   tone: ContentTone;
   audienceStage: AudienceStage;
   boldness: BoldnessLevel;
+    imagePrompt?: string;
   isFavorite: boolean;
   createdAt: string;
 }
