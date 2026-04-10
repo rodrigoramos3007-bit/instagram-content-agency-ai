@@ -7,6 +7,7 @@ import {
 import { useBrandStore } from '@/store/brandStore';
 import { useContentStore } from '@/store/contentStore';
 import { generatePost } from '@/services/openai';
+import { generateImage, formatToSize } from '@/services/imageAI';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent } from '@/components/ui/Card';
@@ -30,6 +31,8 @@ export function PostCreatorPage() {
   const [cta, setCta] = useState('');
   const [hashtags, setHashtags] = useState<string[]>([]);
   const [imagePrompt, setImagePrompt] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [imageLoading, setImageLoading] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
   const [topic, setTopic] = useState('');
   const [selectedObjective, setSelectedObjective] = useState('engajamento');
@@ -65,6 +68,18 @@ export function PostCreatorPage() {
       setImagePrompt(data.imagePrompt || '');
       setSavedId(null);
       toast.success('Post criado com sucesso!');
+      // Auto-generate image
+      if (data.imagePrompt) {
+        setImageLoading(true);
+        try {
+          const url = await generateImage({ prompt: data.imagePrompt, size: '1024x1024', quality: 'hd' });
+          setImageUrl(url);
+        } catch {
+          console.error('Erro ao gerar imagem');
+        } finally {
+          setImageLoading(false);
+        }
+      }
     } catch {
       toast.error('Erro ao gerar post. Tente novamente.');
     } finally {
@@ -290,13 +305,22 @@ export function PostCreatorPage() {
                 </div>
               </div>
 
-              {/* Image placeholder */}
+              {/* Image */}
               <div className="aspect-square bg-brand-elevated rounded-xl mb-3 flex items-center justify-center border border-brand-border overflow-hidden">
-                <div className="text-center">
-                  <Image size={40} className="text-brand-text-muted mx-auto mb-2" />
-                  {headline && <p className="text-white text-xs font-semibold px-4 text-center leading-snug">{headline}</p>}
-                  {!headline && <p className="text-brand-text-muted text-xs">Imagem do post</p>}
-                </div>
+                {imageLoading ? (
+                  <div className="text-center">
+                    <div className="w-8 h-8 border-2 border-brand-primary/30 border-t-brand-primary rounded-full animate-spin mx-auto mb-2" />
+                    <p className="text-brand-text-muted text-xs">Gerando imagem...</p>
+                  </div>
+                ) : imageUrl ? (
+                  <img src={imageUrl} alt="Post" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="text-center">
+                    <Image size={40} className="text-brand-text-muted mx-auto mb-2" />
+                    {headline && <p className="text-white text-xs font-semibold px-4 text-center leading-snug">{headline}</p>}
+                    {!headline && <p className="text-brand-text-muted text-xs">Imagem do post</p>}
+                  </div>
+                )}
               </div>
 
               {/* Caption preview */}
@@ -327,6 +351,11 @@ export function PostCreatorPage() {
     </div>
   );
 }
+
+function XIcon({ size }: { size: number }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M18 6 6 18M6 6l12 12"/></svg>;
+}
+
 
 function XIcon({ size }: { size: number }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M18 6 6 18M6 6l12 12"/></svg>;
