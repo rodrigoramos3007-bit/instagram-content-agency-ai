@@ -1,8 +1,8 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   const apiKey = process.env.OPENAI_API_KEY;
   
   if (!apiKey) {
-    return res.json({ status: 'ERROR', message: 'API key NAO encontrada' });
+    return res.json({ status: 'ERRO', message: 'API key NAO encontrada' });
   }
 
   try {
@@ -19,15 +19,14 @@ export default async function handler(req, res) {
       }),
     });
 
-    const data = await response.json();
-    
+    var data = await response.json();
     if (data.error) {
       return res.json({ status: 'ERRO_OPENAI', error: data.error });
     }
-    
     return res.json({ status: 'OK', resposta: data.choices[0].message.content });
   } catch (error) {
     return res.json({ status: 'ERRO', message: error.message });
   }
-}
+};
+
 
