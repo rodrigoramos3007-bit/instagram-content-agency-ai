@@ -4,6 +4,8 @@ interface GenerateImageOptions {
   prompt: string;
   size?: '1024x1024' | '1024x1792' | '1792x1024';
   quality?: 'standard' | 'hd';
+  headline?: string;
+  brandName?: string;
 }
 
 export async function generateImage(options: GenerateImageOptions): Promise<string> {
@@ -11,6 +13,8 @@ export async function generateImage(options: GenerateImageOptions): Promise<stri
     prompt: options.prompt,
     size: options.size || '1024x1024',
     quality: options.quality || 'hd',
+    headline: options.headline || '',
+    brandName: options.brandName || '',
   });
   return response.data.url;
 }
@@ -24,3 +28,4 @@ export function formatToSize(format: string): '1024x1024' | '1024x1792' | '1792x
   };
   return map[format] || '1024x1024';
 }
+
