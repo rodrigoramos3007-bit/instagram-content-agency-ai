@@ -106,6 +106,12 @@ export function BrandSettingsPage() {
                 <label className="text-xs text-brand-text-muted mb-1.5 block">Instagram</label>
                 <input value={instagram} onChange={(e) => setInstagram(e.target.value)} placeholder="@suamarca" className="w-full bg-brand-elevated border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-brand-primary/50 placeholder:text-brand-text-muted" />
               </div>
+            </div>
+            <div>
+              <label className="text-xs text-brand-text-muted mb-1.5 block">Descrição do Negócio</label>
+              <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} placeholder="Descreva o que sua empresa faz, seus serviços, diferenciais..." className="w-full bg-brand-elevated border border-brand-border rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-brand-primary/50 resize-none placeholder:text-brand-text-muted" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-xs text-brand-text-muted mb-1.5 block">Website</label>
                 <input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://..." className="w-full bg-brand-elevated border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-brand-primary/50 placeholder:text-brand-text-muted" />
@@ -116,10 +122,6 @@ export function BrandSettingsPage() {
                   {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
-            </div>
-            <div>
-              <label className="text-xs text-brand-text-muted mb-1.5 block">Descrição do Negócio</label>
-              <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className="w-full bg-brand-elevated border border-brand-border rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-brand-primary/50 resize-none" />
             </div>
             <div>
               <label className="text-xs text-brand-text-muted mb-1.5 block">Público-alvo</label>
