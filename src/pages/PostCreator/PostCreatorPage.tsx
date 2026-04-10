@@ -72,7 +72,7 @@ export function PostCreatorPage() {
       if (data.imagePrompt) {
         setImageLoading(true);
         try {
-          const url = await generateImage({ prompt: data.imagePrompt, size: '1024x1024', quality: 'hd' });
+                    const url = await generateImage({ prompt: data.imagePrompt, size: '1024x1024', quality: 'hd', headline: data.headline, brandName: brand?.name });
           setImageUrl(url);
         } catch {
           console.error('Erro ao gerar imagem');
