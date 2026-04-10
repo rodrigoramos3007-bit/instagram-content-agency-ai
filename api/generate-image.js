@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   const { prompt, size = '1024x1024', quality = 'hd' } = req.body;
 
   if (!apiKey) {
-    return res.json({ url: `https://picsum.photos/seed/${Date.now()}/1024/1024` });
+    return res.json({ url: 'https://picsum.photos/seed/' + Date.now() + '/1024/1024' });
   }
 
   try {
@@ -17,7 +17,7 @@ export default async function handler(req, res) {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ model: 'dall-e-3', prompt, size, quality, n: 1 }),
+      body: JSON.stringify({ model: 'dall-e-3', prompt: prompt, size: size, quality: quality, n: 1 }),
     });
 
     const data = await response.json();
@@ -25,6 +25,7 @@ export default async function handler(req, res) {
     res.json({ url: data.data[0].url });
   } catch (error) {
     console.error('DALL-E error:', error);
-    res.json({ url: `https://picsum.photos/seed/${Date.now()}/1024/1024` });
+    res.json({ url: 'https://picsum.photos/seed/' + Date.now() + '/1024/1024' });
   }
-}
+};
+
