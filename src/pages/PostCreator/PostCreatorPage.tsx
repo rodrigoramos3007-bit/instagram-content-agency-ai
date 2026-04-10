@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   Image, Sparkles, Copy, Heart, Download, RefreshCw, Wand2,
-  Hash, MessageSquare, Target, ChevronDown
+  Hash, MessageSquare, Target, ChevronDown, ExternalLink
 } from 'lucide-react';
 import { useBrandStore } from '@/store/brandStore';
 import { useContentStore } from '@/store/contentStore';
@@ -72,7 +72,7 @@ export function PostCreatorPage() {
       if (data.imagePrompt) {
         setImageLoading(true);
         try {
-                    const url = await generateImage({ prompt: data.imagePrompt, size: '1024x1024', quality: 'hd', headline: data.headline, brandName: brand?.name });
+          const url = await generateImage({ prompt: data.imagePrompt, size: '1024x1024', quality: 'hd' });
           setImageUrl(url);
         } catch {
           console.error('Erro ao gerar imagem');
@@ -282,9 +282,17 @@ export function PostCreatorPage() {
                     rows={3}
                     className="w-full bg-brand-elevated border border-brand-border rounded-xl px-4 py-3 text-xs text-white font-mono placeholder:text-brand-text-muted outline-none focus:border-brand-primary/50 resize-none"
                   />
-                  <Button variant="secondary" size="sm" leftIcon={<Sparkles size={13} />} onClick={() => window.open('/images', '_blank')}>
-                    Gerar imagem com IA
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button variant="secondary" size="sm" leftIcon={<Sparkles size={13} />} onClick={() => window.open('/images', '_blank')}>
+                      Gerar imagem com IA
+                    </Button>
+                    <Button variant="outline" size="sm" leftIcon={<ExternalLink size={13} />} onClick={() => {
+                      copyToClipboard(imagePrompt);
+                      window.open('https://www.canva.com/design', '_blank');
+                    }}>
+                      Abrir no Canva
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             )}
@@ -346,17 +354,6 @@ export function PostCreatorPage() {
               </div>
             )}
           </motion.div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function XIcon({ size }: { size: number }) {
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M18 6 6 18M6 6l12 12"/></svg>;
-}
-
-
 function XIcon({ size }: { size: number }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M18 6 6 18M6 6l12 12"/></svg>;
 }
