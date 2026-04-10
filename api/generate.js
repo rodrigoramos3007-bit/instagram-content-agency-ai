@@ -1,4 +1,4 @@
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -7,14 +7,14 @@ module.exports = async function handler(req, res) {
   const { prompt, maxTokens = 2000 } = req.body;
 
   if (!apiKey) {
-    return res.json({ text: getMockResponse(prompt) });
+    return res.json({ text: '{"error":"no key"}' });
   }
 
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': 'Bearer ' + apiKey,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -30,18 +30,8 @@ module.exports = async function handler(req, res) {
 
     const data = await response.json();
     if (data.error) throw new Error(data.error.message);
-    res.json({ text: data.choices[0].message.content });
+    return res.json({ text: data.choices[0].message.content });
   } catch (error) {
-    console.error('OpenAI error:', error);
-    res.json({ text: getMockResponse(prompt) });
+    return res.json({ text: JSON.stringify({ headline: 'Erro na API', body: error.message, caption: 'Erro: ' + error.message, cta: 'Tente novamente', hashtags: ['#erro'], keywords: ['erro'], imagePrompt: 'error' }) });
   }
-};
-
-function getMockResponse(prompt) {
-  if (prompt.includes('ideias') || prompt.includes('ideas')) {
-    return JSON.stringify([
-      { title: '3 Erros que travam seu negócio', objective: 'autoridade', format: 'carousel', hook: 'Você comete esses erros...', messageSummary: 'Erros e correções', suggestedCTA: 'Salva!', tone: 'direto', audienceStage: 'morno', boldness: 'equilibrado' },
-    ]);
-  }
-  return JSON.stringify({ headline: 'Conteúdo demo', body: 'Modo demo ativo.', caption: 'Configure a API key para conteúdo real.', cta: 'Salva!', hashtags: ['#demo'], keywords: ['demo'], imagePrompt: 'Demo image' });
 }
