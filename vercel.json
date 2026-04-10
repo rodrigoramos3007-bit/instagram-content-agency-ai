@@ -1,8 +1,5 @@
 {
   "rewrites": [
-    { "source": "/api/generate", "destination": "/api/generate" },
-    { "source": "/api/generate-image", "destination": "/api/generate-image" },
-    { "source": "/api/analyze-brand", "destination": "/api/generate" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
