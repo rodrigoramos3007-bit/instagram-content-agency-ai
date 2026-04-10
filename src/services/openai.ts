@@ -80,7 +80,8 @@ Para cada ideia, retorne um JSON válido no seguinte formato (array):
     "suggestedCTA": "CTA sugerido",
     "tone": "${filters.tone}",
     "audienceStage": "${filters.audienceStage}",
-    "boldness": "${filters.boldness}"
+        "boldness": "${filters.boldness}",
+    "imagePrompt": "Prompt detalhado em inglês para gerar uma imagem profissional para Instagram que represente visualmente esta ideia. Inclua estilo, composição, cores, iluminação e elementos visuais. Use estilo flat design ou ilustração moderna, sem pessoas fotorrealistas."
   }
 ]
 
