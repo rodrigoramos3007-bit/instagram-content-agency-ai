@@ -65,7 +65,18 @@ export function PostCreatorPage() {
       setCaption(data.caption || '');
       setCta(data.cta || '');
       setHashtags(data.hashtags || []);
-      setImagePrompt(data.imagePrompt || '');
+      setImagePrompt(data.imagePrompt || '');      
+// Auto-fill image text fields based on generated content
+if (data.headline) {
+  setImageTitle(data.headline.split(' ').slice(0, 3).join(' '));
+  setImageHeadline(data.headline);
+}
+if (data.caption) {
+  const sentences = data.caption.split(/[.!?]/).filter(s => s.trim().length > 10);
+  if (sentences[0]) setImageSubtitle(sentences[0].trim().substring(0, 50));
+  if (sentences[1]) setImageSubheadline(sentences[1].trim().substring(0, 60));
+}
+
       setSavedId(null);
       toast.success('Post criado com sucesso!');
       // Auto-generate image
