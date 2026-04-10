@@ -25,21 +25,23 @@ DADOS DA MARCA:
 - Objetivos: ${data.goals.join(', ')}
 - Tom preferido: ${data.preferredTone}
 
+IMPORTANTE: Se um website foi informado, analise as cores reais do site e use-as na paleta. Se um Instagram foi informado, analise o perfil e identifique o estilo visual.
+
 Retorne APENAS um JSON válido com esta estrutura exata:
 {
   "niche": "Nicho específico da marca",
-  "nicheIcon": "Nome de um ícone Lucide React adequado (ex: ShoppingBag, Heart, Briefcase)",
+  "nicheIcon": "Nome de um ícone Lucide React adequado (ex: ShoppingBag, Heart, Briefcase, Shield, DollarSign)",
   "audience": "Descrição detalhada do público-alvo",
   "tone": "Tom de voz ideal para a marca",
   "toneScore": 45,
   "valueProposition": "Proposta de valor única da marca",
   "positioning": "Posicionamento estratégico no mercado",
   "colors": {
-    "primary": "#HEX",
-    "secondary": "#HEX",
-    "accent": "#HEX",
-    "background": "#HEX",
-    "text": "#HEX"
+    "primary": "#HEX cor principal da marca baseada no site/instagram",
+    "secondary": "#HEX cor secundária",
+    "accent": "#HEX cor de destaque",
+    "background": "#HEX cor de fundo",
+    "text": "#HEX cor do texto"
   },
   "fonts": {
     "heading": "Nome da fonte para títulos",
@@ -56,16 +58,20 @@ Retorne APENAS um JSON válido com esta estrutura exata:
 
 toneScore: 0 = muito formal, 100 = muito casual.
 editorialPillars deve ter de 4 a 6 pilares com soma de percentages = 100.
+As cores DEVEM refletir a identidade visual real da marca/site informado.
 Responda APENAS com o JSON válido.`;
 
   const text = await generateText({ prompt, maxTokens: 3000 });
-  
+
   try {
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error('No JSON found');
-    return JSON.parse(jsonMatch[0]) as BrandDiagnostic;
+    const parsed = JSON.parse(jsonMatch[0]);
+    if (!parsed.niche || !parsed.colors || !parsed.editorialPillars) {
+      return getMockDiagnostic(data.name);
+    }
+    return parsed as BrandDiagnostic;
   } catch {
-    // Return mock diagnostic if parsing fails
     return getMockDiagnostic(data.name);
   }
 }
@@ -74,11 +80,11 @@ export function getMockDiagnostic(brandName: string = 'Minha Marca'): BrandDiagn
   return {
     niche: 'Marketing Digital e Negócios',
     nicheIcon: 'TrendingUp',
-    audience: 'Empreendedores e profissionais liberais entre 25-45 anos que buscam crescimento profissional',
+    audience: 'Empreendedores e profissionais liberais entre 25-45 anos',
     tone: 'Profissional com toque inspirador',
     toneScore: 40,
-    valueProposition: `${brandName} oferece soluções estratégicas que transformam negócios e geram resultados reais`,
-    positioning: 'Autoridade premium no segmento, com foco em resultados práticos e mensuráveis',
+    valueProposition: brandName + ' oferece soluções estratégicas que transformam negócios',
+    positioning: 'Autoridade premium no segmento',
     colors: {
       primary: '#7C3AED',
       secondary: '#EC4899',
@@ -99,10 +105,8 @@ export function getMockDiagnostic(brandName: string = 'Minha Marca'): BrandDiagn
     ],
     postingFrequency: '5-7 vezes por semana',
     recommendedFormats: ['carousel', 'reel', 'post'],
-    visualStyles: ['Premium Clean', 'Autoridade Profissional', 'Editorial Sofisticado'],
-    contentCategories: [
-      'Dicas práticas', 'Cases de sucesso', 'Bastidores', 'Depoimentos',
-      'Tendências do mercado', 'Reflexões e motivação'
-    ],
+    visualStyles: ['Premium Clean', 'Autoridade Profissional'],
+    contentCategories: ['Dicas práticas', 'Cases de sucesso', 'Bastidores'],
   };
 }
+
