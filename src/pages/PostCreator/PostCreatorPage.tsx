@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent } from '@/components/ui/Card';
 import { LoadingState } from '@/components/common/LoadingState';
-import { copyToClipboard, generateId, downloadTextFile } from '@/lib/utils';
+import { copyToClipboard, generateId, downloadTextFile, getObjectiveColor } from '@/lib/utils';
 import { CONTENT_TONES, CONTENT_OBJECTIVES } from '@/lib/constants';
 import type { GeneratedContent } from '@/types/content';
 import { toast } from 'sonner';
@@ -21,7 +21,7 @@ type VersionKey = 'short' | 'medium' | 'long' | 'emotional' | 'professional' | '
 
 export function PostCreatorPage() {
   const { brand } = useBrandStore();
-  const { addContent, toggleFavorite, favorites } = useContentStore();
+  const { addContent, toggleFavorite, favorites, ideas } = useContentStore();
 
   const [loading, setLoading] = useState(false);
   const [activeVersion, setActiveVersion] = useState<VersionKey>('medium');
@@ -38,16 +38,20 @@ export function PostCreatorPage() {
   const [selectedObjective, setSelectedObjective] = useState('engajamento');
   const [selectedTone, setSelectedTone] = useState('profissional');
   const [captionExpanded, setCaptionExpanded] = useState(false);
+  const [imageTitle, setImageTitle] = useState('');
+  const [imageSubtitle, setImageSubtitle] = useState('');
+  const [imageHeadline, setImageHeadline] = useState('');
+  const [imageSubheadline, setImageSubheadline] = useState('');
 
   // Load from idea if navigated from idea generator
   useEffect(() => {
-    const idea = sessionStorage.getItem('selectedIdea');
+    const idea = localStorage.getItem('selectedIdea');
     if (idea) {
       const parsed = JSON.parse(idea);
       setTopic(parsed.title);
       setSelectedTone(parsed.tone || 'profissional');
       setSelectedObjective(parsed.objective || 'engajamento');
-      sessionStorage.removeItem('selectedIdea');
+      localStorage.removeItem('selectedIdea');
     }
   }, []);
 
@@ -65,25 +69,27 @@ export function PostCreatorPage() {
       setCaption(data.caption || '');
       setCta(data.cta || '');
       setHashtags(data.hashtags || []);
-      setImagePrompt(data.imagePrompt || '');      
-// Auto-fill image text fields based on generated content
-if (data.headline) {
-  setImageTitle(data.headline.split(' ').slice(0, 3).join(' '));
-  setImageHeadline(data.headline);
-}
-if (data.caption) {
-  const sentences = data.caption.split(/[.!?]/).filter(s => s.trim().length > 10);
-  if (sentences[0]) setImageSubtitle(sentences[0].trim().substring(0, 50));
-  if (sentences[1]) setImageSubheadline(sentences[1].trim().substring(0, 60));
-}
-
+      setImagePrompt(data.imagePrompt || '');
+      
+      // Auto-fill image text fields based on generated content
+      if (data.headline) {
+        setImageTitle(data.headline.split(' ').slice(0, 3).join(' '));
+        setImageHeadline(data.headline);
+      }
+      if (data.caption) {
+        const sentences = data.caption.split(/[.!?]/).filter(s => s.trim().length > 10);
+        if (sentences[0]) setImageSubtitle(sentences[0].trim().substring(0, 50));
+        if (sentences[1]) setImageSubheadline(sentences[1].trim().substring(0, 60));
+      }
+      
       setSavedId(null);
       toast.success('Post criado com sucesso!');
+      
       // Auto-generate image
       if (data.imagePrompt) {
         setImageLoading(true);
         try {
-          const url = await generateImage({ prompt: data.imagePrompt, size: '1024x1024', quality: 'hd' });
+          const url = await generateImage({ prompt: data.imagePrompt, headline: data.headline, brandName: brand?.name });
           setImageUrl(url);
         } catch {
           console.error('Erro ao gerar imagem');
@@ -109,6 +115,7 @@ if (data.caption) {
       cta,
       hashtags,
       keywords: [],
+      imageUrl,
       imagePrompt,
       status: 'pronto',
       isFavorite: false,
@@ -271,7 +278,7 @@ if (data.caption) {
                   {hashtags.map((tag, i) => (
                     <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-brand-primary/10 text-brand-primary text-xs rounded-lg border border-brand-primary/20">
                       {tag}
-                      <button onClick={() => setHashtags(hashtags.filter((_, j) => j !== i))} className="hover:text-white ml-0.5"><XIcon size={10} /></button>
+                      <button onClick={() => setHashtags(hashtags.filter((_, j) => j !== i))} className="hover:text-white ml-0.5">×</button>
                     </span>
                   ))}
                   {hashtags.length === 0 && <p className="text-xs text-brand-text-muted">Gere o post para ver as hashtags</p>}
@@ -293,12 +300,49 @@ if (data.caption) {
                     rows={3}
                     className="w-full bg-brand-elevated border border-brand-border rounded-xl px-4 py-3 text-xs text-white font-mono placeholder:text-brand-text-muted outline-none focus:border-brand-primary/50 resize-none"
                   />
+                  
+                  {/* Campos de texto para a imagem */}
+                  <div className="border-t border-brand-border pt-3 mt-3">
+                    <label className="text-xs text-brand-text-muted uppercase tracking-wider mb-2 block">Textos para a imagem (opcional)</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <input
+                        value={imageTitle}
+                        onChange={(e) => setImageTitle(e.target.value)}
+                        placeholder="Título principal"
+                        className="w-full bg-brand-elevated border border-brand-border rounded-lg px-3 py-2 text-xs text-white placeholder:text-brand-text-muted outline-none focus:border-brand-primary/50"
+                      />
+                      <input
+                        value={imageSubtitle}
+                        onChange={(e) => setImageSubtitle(e.target.value)}
+                        placeholder="Subtítulo"
+                        className="w-full bg-brand-elevated border border-brand-border rounded-lg px-3 py-2 text-xs text-white placeholder:text-brand-text-muted outline-none focus:border-brand-primary/50"
+                      />
+                      <input
+                        value={imageHeadline}
+                        onChange={(e) => setImageHeadline(e.target.value)}
+                        placeholder="Cabeçalho"
+                        className="w-full bg-brand-elevated border border-brand-border rounded-lg px-3 py-2 text-xs text-white placeholder:text-brand-text-muted outline-none focus:border-brand-primary/50"
+                      />
+                      <input
+                        value={imageSubheadline}
+                        onChange={(e) => setImageSubheadline(e.target.value)}
+                        placeholder="Subcabeçalho"
+                        className="w-full bg-brand-elevated border border-brand-border rounded-lg px-3 py-2 text-xs text-white placeholder:text-brand-text-muted outline-none focus:border-brand-primary/50"
+                      />
+                    </div>
+                  </div>
+
                   <div className="flex gap-2">
                     <Button variant="secondary" size="sm" leftIcon={<Sparkles size={13} />} onClick={() => window.open('/images', '_blank')}>
                       Gerar imagem com IA
                     </Button>
                     <Button variant="outline" size="sm" leftIcon={<ExternalLink size={13} />} onClick={() => {
-                      copyToClipboard(imagePrompt);
+                      const fullPrompt = imagePrompt + 
+                        (imageTitle ? '\n\nTítulo na imagem: ' + imageTitle : '') +
+                        (imageSubtitle ? '\nSubtítulo: ' + imageSubtitle : '') +
+                        (imageHeadline ? '\nCabeçalho: ' + imageHeadline : '') +
+                        (imageSubheadline ? '\nSubcabeçalho: ' + imageSubheadline : '');
+                      copyToClipboard(fullPrompt);
                       window.open('https://www.canva.com/design', '_blank');
                     }}>
                       Abrir no Canva
@@ -365,6 +409,13 @@ if (data.caption) {
               </div>
             )}
           </motion.div>
-function XIcon({ size }: { size: number }) {
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M18 6 6 18M6 6l12 12"/></svg>;
+        </div>
+      )}
+    </div>
+  );
 }
+
+function XIcon({ size }: { size: number }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M18 6 6 18M6 6l12 12" /></svg>;
+}
+
